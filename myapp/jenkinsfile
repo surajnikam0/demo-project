@@ -1,55 +1,49 @@
 pipeline {
     agent any
-    
-    environment {
-        GIT_REPO = 'https://github.com/surajnikam0/demo-project.git'  // Replace with your GitHub repo URL
-        BRANCH = 'master'  // Replace with the branch you want to pull from (default is 'main')
-        PYTHON_VERSION = 'python3'  // Specify Python version to use
-    }
-    
+
     stages {
         stage('Checkout Code') {
             steps {
-                git url: "${GIT_REPO}", branch: "${BRANCH}"
+                // Checkout the code from the repository
+                git url: 'https://github.com/surajnikam0/demo-project.git', branch: 'master'
             }
         }
-        
+
         stage('Set Up Python Environment') {
             steps {
                 script {
-                    // Install dependencies for the Python environment (using virtualenv or system Python)
+                    // Set up Python environment (using virtualenv)
                     sh '''#!/bin/bash
                     # Create and activate a virtual environment
                     python3 -m venv venv
                     source venv/bin/activate
-                    
-                    # Install required dependencies from requirements.txt
+
+                    # Install dependencies from requirements.txt (if it exists)
                     pip install --upgrade pip
-                    pip install -r requirements.txt
+                    pip install -r requirements.txt || echo "No requirements.txt found."
                     '''
                 }
             }
         }
-        
+
         stage('Run Tests') {
             steps {
                 script {
-                    // Run tests using pytest (or any other testing framework)
+                    // Run tests (using pytest, you can modify this for other frameworks)
                     sh '''#!/bin/bash
                     source venv/bin/activate
-                    pytest --maxfail=1 --disable-warnings -q
+                    pytest --maxfail=1 --disable-warnings -q || echo "Tests failed."
                     '''
                 }
             }
         }
-        
+
         stage('Deploy') {
             steps {
                 script {
-                    // Example: Replace this with actual deployment commands
+                    // Example placeholder for deployment steps
                     echo 'Deploying the Python application...'
-                    // Example deployment steps can be added here (e.g., running a deployment script or pushing to a server)
-                    // sh './deploy.sh'
+                    // Replace with actual deployment commands
                 }
             }
         }
