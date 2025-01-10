@@ -1,0 +1,69 @@
+pipeline {
+    agent any
+    
+    environment {
+        GIT_REPO = 'https://github.com/surajnikam0/demo-project.git'  // Replace with your GitHub repo URL
+        BRANCH = 'master'  // Replace with the branch you want to pull from (default is 'main')
+        PYTHON_VERSION = 'python3'  // Specify Python version to use
+    }
+    
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git url: "${GIT_REPO}", branch: "${BRANCH}"
+            }
+        }
+        
+        stage('Set Up Python Environment') {
+            steps {
+                script {
+                    // Install dependencies for the Python environment (using virtualenv or system Python)
+                    sh '''#!/bin/bash
+                    # Create and activate a virtual environment
+                    python3 -m venv venv
+                    source venv/bin/activate
+                    
+                    # Install required dependencies from requirements.txt
+                    pip install --upgrade pip
+                    pip install -r requirements.txt
+                    '''
+                }
+            }
+        }
+        
+        stage('Run Tests') {
+            steps {
+                script {
+                    // Run tests using pytest (or any other testing framework)
+                    sh '''#!/bin/bash
+                    source venv/bin/activate
+                    pytest --maxfail=1 --disable-warnings -q
+                    '''
+                }
+            }
+        }
+        
+        stage('Deploy') {
+            steps {
+                script {
+                    // Example: Replace this with actual deployment commands
+                    echo 'Deploying the Python application...'
+                    // Example deployment steps can be added here (e.g., running a deployment script or pushing to a server)
+                    // sh './deploy.sh'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Build and deployment succeeded!'
+        }
+        failure {
+            echo 'Build or deployment failed.'
+        }
+        always {
+            echo 'This will always run, regardless of build success or failure.'
+        }
+    }
+}
